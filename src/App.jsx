@@ -788,7 +788,7 @@ function Home({ setPage }) {
         <div className="hero-overlay" />
         <div className="hero-content">
           <div className="hero-eyebrow">Family-Owned · Hickory Hills, IL</div>
-          <h1 className="serif">25 Years of Quality Work, Right in Your Neighborhood.</h1>
+          <h1 className="serif">Quality Work, Right in Your Neighborhood.</h1>
           <p>Interior remodeling, drywall, painting, and handyman work done honest and done right — by a local team you can trust.</p>
           <div className="hero-ctas">
             <button className="btn-primary" onClick={() => setPage("contact")}>Schedule a Consultation</button>

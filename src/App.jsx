@@ -665,6 +665,37 @@ const style = `
     to { opacity: 1; transform: translateY(0); }
   }
 
+  @keyframes markFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* HOUSE MARK — back to top */
+  .scroll-top {
+    position: fixed;
+    bottom: 1.6rem;
+    right: 1.6rem;
+    z-index: 120;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    animation: markFadeIn 0.6s 0.4s ease both;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .scroll-top:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.55);
+  }
+  .scroll-top svg { display: block; width: 30px; height: 30px; }
+
   @media (max-width: 768px) {
     .nav-links { display: none; }
     .hero-stats { display: none; }
@@ -675,6 +706,9 @@ const style = `
     section { padding: 3rem 1.5rem; }
     .mobile-cta { display: block; }
     footer { padding-bottom: 5rem; }
+    /* lift the house mark above the sticky call bar */
+    .scroll-top { bottom: 4.4rem; right: 1.1rem; width: 46px; height: 46px; }
+    .scroll-top svg { width: 26px; height: 26px; }
   }
 `;
 
@@ -940,9 +974,32 @@ function About({ setPage }) {
 function Contact() {
   const [form, setForm] = useState({ name: "", phone: "", email: "", project: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    if (form.name && form.phone) setSubmitted(true);
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!form.name || !form.phone || submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: "8ae10b67-5955-425a-8102-f777721d6e55",
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          message: form.project,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSubmitted(true);
+        setForm({ name: "", phone: "", email: "", project: "" });
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -961,28 +1018,29 @@ function Contact() {
           {submitted ? (
             <div style={{ background: "var(--card)", border: "1px solid var(--gold)", padding: "2rem", borderRadius: "2px" }}>
               <div style={{ color: "var(--gold)", fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", marginBottom: "0.5rem" }}>Message Received</div>
-              <p style={{ color: "#b8b2a8", fontSize: "0.92rem" }}>Thanks {form.name} — we'll call you back shortly to talk through your project.</p>
+              <p style={{ color: "#b8b2a8", fontSize: "0.92rem" }}>Thanks — we'll be in touch soon!</p>
             </div>
           ) : (
-            <>
+            <form onSubmit={handleSubmit}>
+              <input type="hidden" name="access_key" value="8ae10b67-5955-425a-8102-f777721d6e55" />
               <div className="form-group">
                 <label>Name</label>
-                <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Your name" />
+                <input name="name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Your name" />
               </div>
               <div className="form-group">
                 <label>Phone</label>
-                <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="Best number to reach you" />
+                <input name="phone" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="Best number to reach you" />
               </div>
               <div className="form-group">
                 <label>Email</label>
-                <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="your@email.com" />
+                <input name="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="your@email.com" />
               </div>
               <div className="form-group">
                 <label>Project Description</label>
-                <textarea value={form.project} onChange={e => setForm({...form, project: e.target.value})} placeholder="Tell us a bit about what you need..." />
+                <textarea name="message" value={form.project} onChange={e => setForm({...form, project: e.target.value})} placeholder="Tell us a bit about what you need..." />
               </div>
-              <button className="btn-primary" onClick={handleSubmit} style={{ width: "100%" }}>Request a Consultation</button>
-            </>
+              <button type="submit" className="btn-primary" disabled={submitting} style={{ width: "100%" }}>{submitting ? "Sending..." : "Request a Consultation"}</button>
+            </form>
           )}
         </div>
 
@@ -1018,6 +1076,27 @@ function Contact() {
   );
 }
 
+// ── House mark / back-to-top ────────────────────────────────────────────
+function ScrollTop() {
+  return (
+    <button
+      className="scroll-top"
+      aria-label="Back to top"
+      title="Back to top"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+    >
+      <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <g stroke="var(--gold)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M13 29 L32 13 L51 29" />
+          <rect x="20" y="31" width="24" height="21" />
+          <line x1="32" y1="31" x2="32" y2="52" />
+          <line x1="20" y1="40.5" x2="44" y2="40.5" />
+        </g>
+      </svg>
+    </button>
+  );
+}
+
 // ── APP ───────────────────────────────────────────────────────────────────
 export default function App() {
   const [page, setPage] = useState("home");
@@ -1034,6 +1113,7 @@ export default function App() {
       {page === "contact" && <Contact />}
       <Footer setPage={setPage} />
       <a href="tel:7737325940" className="mobile-cta">📞 Call Now — 773-732-5940</a>
+      <ScrollTop />
     </>
   );
 }

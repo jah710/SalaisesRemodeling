@@ -718,7 +718,7 @@ function Nav({ page, setPage }) {
     <nav>
       <div className="nav-brand" onClick={() => setPage("home")} style={{ cursor: "pointer" }}>
         <span className="name">Salaises Remodeling HD</span>
-        <span className="sub">Hickory Hills, IL · 25 Years Experience</span>
+        <span className="sub">Hickory Hills, IL</span>
       </div>
       <ul className="nav-links">
         {["home", "services", "about", "contact"].map((p) => (
@@ -815,7 +815,7 @@ function Home({ setPage }) {
         <div className="about-intro-inner">
           <div className="section-eyebrow">Honest Work. Fair Prices. Built to Last.</div>
           <h2 className="serif">Quietly raising the standard with 25 years of experience.</h2>
-          <p>Salaises Remodeling HD has spent 25 years raising the standard of home improvement in Hickory Hills and the surrounding suburbs. Whether it's a full kitchen remodel or a leaky faucet, we treat every job with the same care — because your home deserves it.</p>
+          <p>Salaises' associates have spent 25 years raising the standard of home improvement in Hickory Hills and the surrounding suburbs. Whether it's a full kitchen remodel or a leaky faucet, we treat every job with the same care — because your home deserves it.</p>
         </div>
       </section>
 
